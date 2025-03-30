@@ -1,0 +1,38 @@
+@page "/allstudents"
+@inject HttpClient httpClient
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using SchoolLibrary.Student  @* Replace this with your actual namespace *@
+
+<h1>All Students</h1>
+
+@if (students == null)
+{
+    <p><em>Loading students...</em></p>
+}
+else
+{
+    <QuickGrid Items="@students" ResizableColumns="true">
+        <PropertyColumn Property="s => s.StudentId" Title="ID" />
+        <PropertyColumn Property="s => s.FirstName" Title="First Name" />
+        <PropertyColumn Property="s => s.LastName" Title="Last Name" />
+        <PropertyColumn Property="s => s.School" Title="School" />
+
+        <TemplateColumn Title="Actions" Context="student">
+            <ChildContent>
+                <div>
+                    <a class="btn btn-sm btn-primary" href="/updatedelete/@student.StudentId/edit">Edit</a>
+                    <a class="btn btn-sm btn-danger" href="/updatedelete/@student.StudentId/del">Delete</a>
+                </div>
+            </ChildContent>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+@code {
+    private List<Student>? students;
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await httpClient.GetFromJsonAsync<List<Student>>($"{Constants.BaseUrl}api/students");
+    }
+}
